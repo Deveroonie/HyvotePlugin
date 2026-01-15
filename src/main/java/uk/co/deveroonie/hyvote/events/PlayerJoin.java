@@ -29,6 +29,8 @@ public class PlayerJoin {
                             ProcessVote.handleAction(action, vote);
                         }
                     }
+
+                    HyvotePlugin.getConnection().deletePendingVote(vote.getId());
                 }
             }
         } catch (Exception e) {
