@@ -38,7 +38,8 @@ public class ProcessVote {
             return;
         }
 
-        if(HyvotePlugin.getConnection().nonceExists(vote.nonce)) return;
+        if (HyvotePlugin.getConnection().nonceExists(vote.nonce)) return;
+        HyvotePlugin.getConnection().saveNonce(vote.nonce);
 
         List<Action> actions = HyvotePlugin.getSettings().actions;
 
