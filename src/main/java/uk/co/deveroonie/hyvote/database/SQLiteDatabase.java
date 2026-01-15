@@ -85,6 +85,7 @@ public class SQLiteDatabase implements Database {
             try (ResultSet results = statement.executeQuery()) {
                 while (results.next()) {
                     Vote vote = new Vote();
+                    vote.id = results.getInt("id");
                     vote.uuid = results.getString("uuid");
                     vote.playerName = results.getString("player_name");
                     vote.voteSite = results.getString("vote_site");
