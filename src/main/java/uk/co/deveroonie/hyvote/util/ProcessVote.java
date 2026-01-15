@@ -47,12 +47,16 @@ public class ProcessVote {
         PlayerRef player = Universe.get().getPlayerByUsername(vote.playerName, NameMatching.EXACT_IGNORE_CASE);
         VoteEventManager.fireEvent(vote);
         if(player == null) {
+            // Check if there are any actions that require the player to be online
+            boolean hasNonVoteActions = actions.stream().anyMatch(action -> !Objects.equals(action.on, "vote"));
+            if(hasNonVoteActions) {
+                HyvotePlugin.getConnection().savePendingVote(vote);
+            }
+            
             // Only do onVote actions
             for (Action action : actions) {
                 if(Objects.equals(action.on, "vote")) {
                     handleAction(action, vote);
-                } else {
-                    HyvotePlugin.getConnection().savePendingVote(vote);
                 }
             }
         } else {
