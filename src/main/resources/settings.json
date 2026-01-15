@@ -1,5 +1,13 @@
 {
   "port": 2250,
+  "database": {
+    "type": "sqlite",
+    "_comment": "The following options are ignored when using sqlite.",
+    "host": "localhost",
+    "port": 3306,
+    "username": "hytale",
+    "password": "supersecretdatabasepassword"
+  },
   "actions": [
     {
       "on": "vote",

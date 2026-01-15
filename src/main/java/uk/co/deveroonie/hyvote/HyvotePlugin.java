@@ -1,24 +1,33 @@
 package uk.co.deveroonie.hyvote;
 
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import tools.jackson.databind.ObjectMapper;
+import uk.co.deveroonie.hyvote.database.Database;
+import uk.co.deveroonie.hyvote.database.DatabaseFactory;
+import uk.co.deveroonie.hyvote.events.PlayerJoin;
+import uk.co.deveroonie.hyvote.models.DatabaseProvider;
 import uk.co.deveroonie.hyvote.models.Settings;
 import uk.co.deveroonie.hyvote.server.HyvoteServer;
 import uk.co.deveroonie.hyvote.util.Keys;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.logging.Level;
 
 public class HyvotePlugin extends JavaPlugin {
     public static Path dataDir;
     public static Settings settings;
     public static HytaleLogger logger;
+    public static Database database;
 
     public HyvotePlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -52,6 +61,9 @@ public class HyvotePlugin extends JavaPlugin {
                 Keys.saveKeys();
             }
 
+
+
+
             ObjectMapper objectMapper = new ObjectMapper();
 
             try (InputStream in = Files.newInputStream(dataDir.resolve("settings.json"))) {
@@ -60,9 +72,14 @@ public class HyvotePlugin extends JavaPlugin {
                 getLogger().at(Level.SEVERE).log("Failed to load settings.");
                 throw new RuntimeException(e);
             }
-
+            // Set up the database
+            database = DatabaseFactory.createDatabase(settings.database);
+            database.connect();
+            database.initialize();
             logger = getLogger();
             new HyvoteServer().start();
+
+            this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, PlayerJoin::onPlayerReady);
 
         } catch (IOException e) {
             getLogger().at(Level.SEVERE).log("Failed to extract settings.json.");
@@ -78,6 +95,11 @@ public class HyvotePlugin extends JavaPlugin {
     @Override
     protected void shutdown() {
         super.shutdown();
+        try {
+            database.disconnect();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Path getDataDir() { return dataDir; }
@@ -85,4 +107,6 @@ public class HyvotePlugin extends JavaPlugin {
     public static Settings getSettings() { return settings; }
 
     public static HytaleLogger getLog() { return logger; }
+
+    public static Database getConnection() { return database; }
 }

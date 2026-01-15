@@ -13,6 +13,7 @@ import uk.co.deveroonie.hyvote.api.VoteEventManager;
 import uk.co.deveroonie.hyvote.models.Action;
 import uk.co.deveroonie.hyvote.models.Vote;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,11 @@ import java.util.logging.Level;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public class ProcessVote {
-    CommandManager manager = CommandManager.get();
-    CommandSender console = ConsoleSender.INSTANCE;
+    static CommandManager manager = CommandManager.get();
+    static CommandSender console = ConsoleSender.INSTANCE;
 
 
-    public ProcessVote(byte[] voteMessage) {
+    public ProcessVote(byte[] voteMessage) throws SQLException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Vote vote = objectMapper.readValue(voteMessage, Vote.class);
@@ -36,6 +37,8 @@ public class ProcessVote {
             HyvotePlugin.getLog().at(Level.INFO).log("Failed to process malformed vote.");
             return;
         }
+
+        if(HyvotePlugin.getConnection().nonceExists(vote.nonce)) return;
 
         List<Action> actions = HyvotePlugin.getSettings().actions;
 
@@ -47,6 +50,8 @@ public class ProcessVote {
             for (Action action : actions) {
                 if(Objects.equals(action.on, "vote")) {
                     handleAction(action, vote);
+                } else {
+                    HyvotePlugin.getConnection().savePendingVote(vote);
                 }
             }
         } else {
@@ -56,7 +61,7 @@ public class ProcessVote {
         }
     }
 
-    private void handleAction(Action action, Vote vote, PlayerRef... player) {
+    public static void handleAction(Action action, Vote vote, PlayerRef... player) {
         if(Objects.equals(action.type, "command")) {
             Map<String, String> valuesMap = new HashMap<>();
             valuesMap.put("player", vote.playerName);
