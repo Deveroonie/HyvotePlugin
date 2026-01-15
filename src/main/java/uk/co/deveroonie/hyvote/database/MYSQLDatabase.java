@@ -101,6 +101,7 @@ public class MYSQLDatabase implements Database {
                     vote.playerName = results.getString("player_name");
                     vote.voteSite = results.getString("vote_site");
                     vote.timestamp = results.getLong("timestamp");
+                    vote.id = results.getInt("id");
                     pendingVotes.add(vote);
                 }
             }

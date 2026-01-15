@@ -27,6 +27,7 @@ public class HyvotePlugin extends JavaPlugin {
     public static Settings settings;
     public static HytaleLogger logger;
     public static Database database;
+    private static HyvoteServer server;
 
     public HyvotePlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -76,7 +77,8 @@ public class HyvotePlugin extends JavaPlugin {
             database.connect();
             database.initialize();
             logger = getLogger();
-            new HyvoteServer().start();
+            server = new HyvoteServer();
+            server.start();
 
             this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, PlayerJoin::onPlayerReady);
 
@@ -94,10 +96,16 @@ public class HyvotePlugin extends JavaPlugin {
     @Override
     protected void shutdown() {
         super.shutdown();
-        try {
-            database.disconnect();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (server != null) {
+            server.stop();
+        }
+
+        if (database != null) {
+            try {
+                database.disconnect();
+            } catch (SQLException e) {
+                getLogger().atSevere().log("Failed to disconnect database", e);
+            }
         }
     }
 

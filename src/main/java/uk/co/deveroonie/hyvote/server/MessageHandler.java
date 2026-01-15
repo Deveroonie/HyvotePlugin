@@ -43,33 +43,34 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
                 fullMessage[1] == 'V' &&
                 fullMessage[2] == '0' &&
                 fullMessage[3] == '1') {
+
             ByteBuffer buf = ByteBuffer.wrap(fullMessage);
             buf.position(4);
-            int keyLength = buf.getInt();
-            byte[] encryptedKey = new byte[keyLength];
-            buf.get(encryptedKey);
 
-            int payloadLength = buf.getInt();
-            byte[] encryptedPayload = new byte[payloadLength];
-            buf.get(encryptedPayload);
-            // make sure they aren't doing anything outrageous
+            int keyLength = buf.getInt();
             if (keyLength < 0 || keyLength > 512) {
                 ctx.close();
                 return;
             }
+
+            byte[] encryptedKey = new byte[keyLength];
+            buf.get(encryptedKey);
+
+            int payloadLength = buf.getInt();
             if (payloadLength < 0 || payloadLength > 8192) {
                 ctx.close();
                 return;
             }
-            if (buf.remaining() < keyLength + 4 + payloadLength) {
+
+            if (buf.remaining() < payloadLength) {
                 ctx.close();
                 return;
             }
-
-            // probably okay now!
+            byte[] encryptedPayload = new byte[payloadLength];
+            buf.get(encryptedPayload);
 
             // decrypt the AES key
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.DECRYPT_MODE, Keys.getPrivateKey());
 
             byte[] aesKeyBytes = cipher.doFinal(encryptedKey);
@@ -83,10 +84,11 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
             SecretKey aesKey = new SecretKeySpec(aesKeyBytes, "AES");
             aesCipher.init(Cipher.DECRYPT_MODE, aesKey, ivSpec);
 
-            byte[] voteMessage = cipher.doFinal(actualPayload);
+            byte[] voteMessage = aesCipher.doFinal(actualPayload);
 
             // Pass it down for processing
             new ProcessVote(voteMessage);
+            ctx.close();
         }
 
     }

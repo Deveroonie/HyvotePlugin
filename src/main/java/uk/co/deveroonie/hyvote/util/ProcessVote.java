@@ -12,6 +12,7 @@ import uk.co.deveroonie.hyvote.HyvotePlugin;
 import uk.co.deveroonie.hyvote.api.VoteEventManager;
 import uk.co.deveroonie.hyvote.models.Action;
 import uk.co.deveroonie.hyvote.models.Vote;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class ProcessVote {
 
 
     public ProcessVote(byte[] voteMessage) throws SQLException {
+        HyvotePlugin.getLog().at(Level.INFO).log("Handling vote...");
         ObjectMapper objectMapper = new ObjectMapper();
 
         Vote vote = objectMapper.readValue(voteMessage, Vote.class);
@@ -72,7 +74,10 @@ public class ProcessVote {
             valuesMap.put("player", vote.playerName);
             valuesMap.put("voteSite", vote.voteSite);
 
-            manager.handleCommand(console, action.command);
+            StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+            String command = substitutor.replace(action.command);
+
+            manager.handleCommand(console, command);
         }
     }
 }
