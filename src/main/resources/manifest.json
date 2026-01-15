@@ -1,0 +1,16 @@
+{
+  "Group": "Deveroonie",
+  "Name": "Hyvote",
+  "Version": "1.0.0",
+  "Description": "Hyvote is a plugin that can receive and process votes.",
+  "Authors": [
+    {
+      "Name": "Deverooniie"
+    }
+  ],
+  "Website": "https://deveroonie.co.uk",
+  "ServerVersion": "*",
+  "DisabledByDefault": false,
+  "Main": "uk.co.deveroonie.hyvote.HyvotePlugin",
+  "IncludesAssetPack": false
+}

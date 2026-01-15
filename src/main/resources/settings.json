@@ -1,0 +1,15 @@
+{
+  "port": 2250,
+  "actions": [
+    {
+      "on": "vote",
+      "type": "command",
+      "command": "say ${player} just voted on ${voteSite}"
+    },
+    {
+      "on": "join",
+      "type": "command",
+      "command": "say ${player} has joined (or is online) after voting for ${voteSite}"
+    }
+  ]
+}
