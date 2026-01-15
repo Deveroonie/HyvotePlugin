@@ -29,11 +29,8 @@ public class PlayerJoin {
                             ProcessVote.handleAction(action, vote);
                         }
                     }
-                    
-                    // Delete the pending vote after processing
-                    if (vote.id != null) {
-                        HyvotePlugin.getConnection().deletePendingVote(vote.id);
-                    }
+
+                    HyvotePlugin.getConnection().deletePendingVote(vote.getId());
                 }
             }
         } catch (Exception e) {
