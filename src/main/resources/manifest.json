@@ -1,7 +1,7 @@
 {
   "Group": "Deveroonie",
   "Name": "Hyvote",
-  "Version": "1.1.0",
+  "Version": "1.1.1",
   "Description": "Hyvote is a plugin that can receive and process votes.",
   "Authors": [
     {

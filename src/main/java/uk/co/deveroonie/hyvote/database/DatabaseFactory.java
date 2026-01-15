@@ -6,6 +6,8 @@ public class DatabaseFactory {
     public static Database createDatabase(DatabaseProvider config) {
         return switch (config.type.toLowerCase()) {
             case "sqlite" -> new SQLiteDatabase(config);
+            case "mysql" -> new MYSQLDatabase(config);
+            case "mariadb" -> new MariaDBDatabase(config);
             default -> throw new IllegalArgumentException("Unsupported database type: " + config.type);
         };
     }

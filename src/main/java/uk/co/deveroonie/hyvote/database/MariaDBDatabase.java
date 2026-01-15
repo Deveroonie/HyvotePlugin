@@ -4,29 +4,41 @@ import uk.co.deveroonie.hyvote.HyvotePlugin;
 import uk.co.deveroonie.hyvote.models.DatabaseProvider;
 import uk.co.deveroonie.hyvote.models.Vote;
 
-import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 
-public class SQLiteDatabase implements Database {
+public class MariaDBDatabase implements Database {
     private Connection connection;
-    private final String filePath;
+    private final String host;
+    private final int port;
+    private final String username;
+    private final String password;
+    private final String database;
 
-    public SQLiteDatabase(DatabaseProvider config) {
-        this.filePath = new File(HyvotePlugin.getDataDir() + "/database.db").getAbsolutePath();
+    public MariaDBDatabase(DatabaseProvider config) {
+        this.host = config.host;
+        this.port = config.port;
+        this.username = config.username;
+        this.password = config.password;
+        this.database = config.database;
     }
 
     @Override
     public void connect() throws SQLException {
         try {
-            Class.forName("org.sqlite.JDBC");
+            Class.forName("org.mariadb.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            HyvotePlugin.getLog().at(Level.SEVERE).log("SQLite JDBC driver not found");
-            throw new RuntimeException("SQLite JDBC driver not found", e);
+            HyvotePlugin.getLog().at(Level.SEVERE).log("MYSQL JDBC driver not found");
+            throw new RuntimeException("MYSQL JDBC driver not found", e);
         }
-        connection = DriverManager.getConnection("jdbc:sqlite:" + filePath);
+        Properties properties = new Properties();
+        properties.setProperty("username", username);
+        properties.setProperty("password", password);
+        connection = DriverManager.getConnection("jdbc:mariadb://"+host+":"+port+"/"+database, properties);
+
     }
 
     @Override
