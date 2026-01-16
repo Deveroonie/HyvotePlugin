@@ -35,7 +35,7 @@ public class ProcessVote {
         Vote vote = objectMapper.readValue(voteMessage, Vote.class);
 
         // Make sure it isn't malformed
-        if (isEmpty(vote.uuid) || isEmpty(vote.playerName) || StringUtils.isEmpty(vote.voteSite) || isEmpty(vote.timestamp) || StringUtils.isEmpty(vote.nonce)) {
+        if (isEmpty(vote.playerName) || StringUtils.isEmpty(vote.voteSite) || isEmpty(vote.timestamp) || StringUtils.isEmpty(vote.nonce)) {
             HyvotePlugin.getLog().at(Level.INFO).log("Failed to process malformed vote.");
             return;
         }

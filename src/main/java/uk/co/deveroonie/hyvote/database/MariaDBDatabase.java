@@ -49,11 +49,11 @@ public class MariaDBDatabase implements Database {
     }
 
     @Override
-    public void savePendingVote(Vote vote) throws SQLException {
+    public void savePendingVote(Vote vote, String uuid) throws SQLException {
         String sql = "INSERT INTO pendingvotes(uuid, player_name, vote_site, timestamp) VALUES(?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, vote.uuid);
+            statement.setString(1, uuid);
             statement.setString(2, vote.playerName);
             statement.setString(3, vote.voteSite);
             statement.setLong(4, vote.timestamp);
@@ -97,7 +97,6 @@ public class MariaDBDatabase implements Database {
             try (ResultSet results = statement.executeQuery()) {
                 while (results.next()) {
                     Vote vote = new Vote();
-                    vote.uuid = results.getString("uuid");
                     vote.playerName = results.getString("player_name");
                     vote.voteSite = results.getString("vote_site");
                     vote.timestamp = results.getLong("timestamp");

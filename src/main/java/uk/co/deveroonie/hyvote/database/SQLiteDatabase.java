@@ -37,11 +37,11 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
-    public void savePendingVote(Vote vote) throws SQLException {
+    public void savePendingVote(Vote vote, String uuid) throws SQLException {
         String sql = "INSERT INTO pendingvotes(uuid, player_name, vote_site, timestamp) VALUES(?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, vote.uuid);
+            statement.setString(1, uuid);
             statement.setString(2, vote.playerName);
             statement.setString(3, vote.voteSite);
             statement.setLong(4, vote.timestamp);
