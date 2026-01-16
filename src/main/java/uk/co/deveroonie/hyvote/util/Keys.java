@@ -1,6 +1,7 @@
 package uk.co.deveroonie.hyvote.util;
 
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -18,25 +19,30 @@ public class Keys {
         String privateKey = Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(keyPair.getPrivate().getEncoded());
         String publicKey = Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(keyPair.getPublic().getEncoded());
 
-        try (FileOutputStream stream = new FileOutputStream(getDataDir().resolve("private.key").toFile())) {
-            String pem = "-----BEGIN PRIVATE KEY-----\n" +
+            String privatePEM = "-----BEGIN PRIVATE KEY-----\n" +
                     privateKey +
                     "\n-----END PRIVATE KEY-----";
 
-            stream.write(pem.getBytes());
-        }
+            Files.writeString(getDataDir().resolve("private.key"), privatePEM, StandardCharsets.US_ASCII);
 
-        try (FileOutputStream stream = new FileOutputStream(getDataDir().resolve("public.key").toFile())) {
-            String pem = "-----BEGIN PUBLIC KEY-----\n" +
+            String publicPEM = "-----BEGIN PUBLIC KEY-----\n" +
                     publicKey +
                     "\n-----END PUBLIC KEY-----";
 
-            stream.write(pem.getBytes());
-        }
+            Files.writeString(getDataDir().resolve("public.key"), publicPEM, StandardCharsets.US_ASCII);
     }
 
     public static PrivateKey getPrivateKey() throws Exception {
-        String base64 = Files.readString(getDataDir().resolve("private.key"));
+        String pem = Files.readString(
+                getDataDir().resolve("private.key"),
+                StandardCharsets.US_ASCII
+        );
+
+        String base64 = pem
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", ""); // removes newlines & spaces
+
         byte[] decoded = Base64.getDecoder().decode(base64);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
