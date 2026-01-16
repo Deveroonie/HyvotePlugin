@@ -58,7 +58,7 @@ Settings are stored in `settings.json`:
 
 ### Database Properties
 Databases are used to track which nonces have been used and deliver votes for actions that require the user to be online but are recieved when offline.
-- **type**: The database type to use (supported - MySQL, MariaDB, SQLite)
+- **type**: The database type to use (supported - MySQL, MariaDB, SQLite, PostgreSQL)
 - **host**: The host of the database (ignored when using SQLite)
 - **port**: The port that the database listens on (ignored when using SQLite)
 - **username**: The username for the database user (ignored when using SQLite)
