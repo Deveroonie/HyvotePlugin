@@ -15,15 +15,23 @@ public class Keys {
 
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-        String privateKey = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
-        String publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+        String privateKey = Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(keyPair.getPrivate().getEncoded());
+        String publicKey = Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(keyPair.getPublic().getEncoded());
 
         try (FileOutputStream stream = new FileOutputStream(getDataDir().resolve("private.key").toFile())) {
-            stream.write(privateKey.getBytes());
+            String pem = "-----BEGIN PRIVATE KEY-----\n" +
+                    privateKey +
+                    "\n-----END PRIVATE KEY-----";
+
+            stream.write(pem.getBytes());
         }
 
         try (FileOutputStream stream = new FileOutputStream(getDataDir().resolve("public.key").toFile())) {
-            stream.write(publicKey.getBytes());
+            String pem = "-----BEGIN PUBLIC KEY-----\n" +
+                    publicKey +
+                    "\n-----END PUBLIC KEY-----";
+
+            stream.write(pem.getBytes());
         }
     }
 
