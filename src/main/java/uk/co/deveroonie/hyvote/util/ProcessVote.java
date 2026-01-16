@@ -52,7 +52,7 @@ public class ProcessVote {
             // Check if there are any actions that require the player to be online
             boolean hasNonVoteActions = actions.stream().anyMatch(action -> !Objects.equals(action.on, "vote"));
             if(hasNonVoteActions) {
-                HyvotePlugin.getConnection().savePendingVote(vote);
+                HyvotePlugin.getConnection().savePendingVote(vote, String.valueOf(player.getUuid()));
             }
             
             // Only do onVote actions
