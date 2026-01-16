@@ -133,7 +133,7 @@ public class MYSQLDatabase implements Database {
     public void initialize() throws SQLException {
         String createPendingVotes = """
             CREATE TABLE IF NOT EXISTS pendingvotes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY AUTO_INCREMENT,
                 uuid TEXT NOT NULL,
                 player_name TEXT NOT NULL,
                 vote_site TEXT NOT NULL,
